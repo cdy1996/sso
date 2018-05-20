@@ -19,17 +19,34 @@ public class LoginInterceptor  implements HandlerInterceptor {
         if (uri.contains("login") || uri.contains("logout")) {
             return true;
         }
-        String username = CookieUtil.getCookieAttribute("username-client1", request);
+//        String username = CookieUtil.getCookieAttribute("username-client1", request);
+        
+        //在服务端回调时会把token放在uri上
+        String token = request.getParameter("token");
         HttpSession session = request.getSession();
-        if (username != null && !"".equals(username)) {
-            session.setAttribute("username", username);
-            return true;
+        
+        //将token存在session，方便
+        if (token == null) {
+            token = (String) session.getAttribute("token");
         } else {
-            username = CookieUtil.getCookieAttribute("username", request);
+            session.setAttribute("token", token);
+        }
+        
+        if(token != null) {
+            String username = JedisUtil.get("client1:token"+token);
+           
             if (username != null && !"".equals(username)) {
-                CookieUtil.addCookieAttribute("username-client1", username, 60 * 60, response);
-                session.setAttribute("username", username);
+                JedisUtil.set("client1:username:"+username, username);
                 return true;
+            } else {
+//                username = CookieUtil.getCookieAttribute("username", request);
+                username = (String)HttpClientUtil.doGet(UrlContants.server + "user?token=" + token);
+                if (username != null && !"".equals(username)) {
+                    JedisUtil.set("client1:"+username, username);
+//                    CookieUtil.addCookieAttribute("username-client1", username, 60 * 60, response);
+                    session.setAttribute("username", username);
+                    return true;
+                }
             }
         }
         String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+uri;
