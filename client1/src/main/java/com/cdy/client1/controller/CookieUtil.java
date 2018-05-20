@@ -2,6 +2,7 @@ package com.cdy.client1.controller;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * todo
@@ -21,5 +22,24 @@ public class CookieUtil {
             }
         }
         return null;
+    }
+    
+    public static void addCookieAttribute(String key, String value, int time, HttpServletResponse response){
+        Cookie cookie = new Cookie(key, value);//创建新cookie
+        cookie.setMaxAge(time);// 设置存在时间为5分钟
+        cookie.setPath("/");//设置作用域
+        response.addCookie(cookie);//将cookie添加到response的cookie数组中返回给客户端
+    }
+    
+    public static void delCookieAttribute(String key, HttpServletRequest request, HttpServletResponse response){
+        Cookie[] cookies = request.getCookies();
+        for (Cookie cookie : cookies) {
+            if (key.equalsIgnoreCase(cookie.getName())) {
+                cookie.setValue(null);
+                cookie.setMaxAge(0);
+                cookie.setPath("/");
+                response.addCookie(cookie);
+            }
+        }
     }
 }

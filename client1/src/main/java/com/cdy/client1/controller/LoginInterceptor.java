@@ -19,11 +19,18 @@ public class LoginInterceptor  implements HandlerInterceptor {
         if (uri.contains("login") || uri.contains("logout")) {
             return true;
         }
-        String username = CookieUtil.getCookieAttribute("username", request);
+        String username = CookieUtil.getCookieAttribute("username-client1", request);
         HttpSession session = request.getSession();
-        if (username != null) {
+        if (username != null && !"".equals(username)) {
             session.setAttribute("username", username);
             return true;
+        } else {
+            username = CookieUtil.getCookieAttribute("username", request);
+            if (username != null && !"".equals(username)) {
+                CookieUtil.addCookieAttribute("username-client1", username, 60 * 60, response);
+                session.setAttribute("username", username);
+                return true;
+            }
         }
         String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+uri;
         response.sendRedirect(UrlContants.server + "/tologin?redirect=" + basePath);
