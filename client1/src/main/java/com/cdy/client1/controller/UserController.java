@@ -21,19 +21,19 @@ public class UserController {
     }
     
     @RequestMapping("/logout")
-    public void logout(HttpServletResponse response) throws IOException {
-        response.sendRedirect(UrlContants.server + "/logout");
+    public void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
+         String token = CookieUtil.getCookieAttribute("client1-token", request);
+        response.sendRedirect(UrlContants.server + "/logout?token="+token);
     }
     
     @RequestMapping("/user")
     @ResponseBody
-    public String user(HttpServletRequest request) {
-        String username = request.getParameter("username");
-        if(username == null || username.isEmpty()) {
-            username = CookieUtil.getCookieAttribute("username-client1", request);
+    public String user(HttpServletRequest request) throws IOException {
+        String token = request.getParameter("token");
+        if(token == null || token.isEmpty()) {
+            token = CookieUtil.getCookieAttribute("client1-token", request);
         }
-        String password = JedisUtil.get(username);
-        System.out.println(username+"-"+password);
-        return username+"-"+password;
+        String result = (String) HttpClientUtil.doGet(UrlContants.server + "/user?token="+token);
+        return result;
     }
 }

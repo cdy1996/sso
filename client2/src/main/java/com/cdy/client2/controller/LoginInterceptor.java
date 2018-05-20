@@ -21,16 +21,16 @@ public class LoginInterceptor  implements HandlerInterceptor {
         }
         
         //在登录系统登录后会返回username
-        String username = request.getParameter("username");
-        if(username !=null && !username.isEmpty()) {
+        String token = request.getParameter("username");
+        if(token !=null && !token.isEmpty()) {
             //在子系统也加入到cookie
-            CookieUtil.addCookieAttribute("username-client2", username, 60*60, response);
+            CookieUtil.addCookieAttribute("client2-token", token, 60*60, response);
             return true;
         }
         
         //已经登陆过了
-        username = CookieUtil.getCookieAttribute("username-client2", request);
-        if(username !=null && !username.isEmpty()) {
+        token = CookieUtil.getCookieAttribute("client2-token", request);
+        if(token !=null && !token.isEmpty()) {
             return true;
         }
     

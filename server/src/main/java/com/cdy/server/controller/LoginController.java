@@ -19,16 +19,19 @@ public class LoginController {
     @RequestMapping("/user")
     @ResponseBody
     public String user(HttpServletRequest request){
-        String username = CookieUtil.getCookieAttribute("username", request);
-        String password = JedisUtil.get(username);
-        return username+"-"+password;
+        String token = request.getParameter("token");
+        if(token ==null || token.isEmpty()) {
+            token = CookieUtil.getCookieAttribute("token", request);
+        }
+        String password = JedisUtil.get(token);
+        return token+"-"+password;
     }
     
     @RequestMapping("/tologin")
     public String toLogin(HttpServletRequest request,HttpServletResponse response, String redirect, Model model) throws IOException {
-        String username = CookieUtil.getCookieAttribute("username", request);
+        String username = CookieUtil.getCookieAttribute("token", request);
         if (username != null) {
-            response.sendRedirect(redirect+"username="+username);
+            response.sendRedirect(redirect+"?token="+username);
             return null;
         }
         model.addAttribute("redirect", redirect);
@@ -37,16 +40,17 @@ public class LoginController {
     
     @RequestMapping("/login")
     public void login(HttpServletRequest request,HttpServletResponse response, String username, String password, String redirect) throws IOException {
-        CookieUtil.addCookieAttribute("username", username, 60*60, response);
+        CookieUtil.addCookieAttribute("token", username, 60*60, response);
         JedisUtil.set(username, password, 60 * 60);
-        response.sendRedirect(redirect+"?username="+username);
+        response.sendRedirect(redirect+"?token="+username);
     }
     
     @RequestMapping("/logout")
-    public String logout(HttpServletRequest request, HttpServletResponse response) {
-        CookieUtil.delCookieAttribute("username", request, response);
-        CookieUtil.delCookieAttribute("client1-username", request, response);
-        CookieUtil.delCookieAttribute("client2-username", request, response);
+    public String logout(HttpServletRequest request, HttpServletResponse response, String token) {
+        CookieUtil.delCookieAttribute("token", request, response);
+        CookieUtil.delCookieAttribute("client1-token", request, response);
+        CookieUtil.delCookieAttribute("client2-token", request, response);
+        JedisUtil.delete(token);
         return "forward:tologin";
         
     }
