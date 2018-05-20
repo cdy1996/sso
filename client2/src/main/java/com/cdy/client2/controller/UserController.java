@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 /**
@@ -29,8 +28,8 @@ public class UserController {
     @RequestMapping("/user")
     @ResponseBody
     public String user(HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        String username = (String)session.getAttribute("username");
+       
+        String username = CookieUtil.getCookieAttribute("username-client2", request);
         System.out.println(username);
         return username;
     }

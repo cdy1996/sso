@@ -5,7 +5,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /**
  * Created by 陈东一
@@ -19,19 +18,22 @@ public class LoginInterceptor  implements HandlerInterceptor {
         if (uri.contains("login") || uri.contains("logout")) {
             return true;
         }
-        String username = CookieUtil.getCookieAttribute("username-client1", request);
-        HttpSession session = request.getSession();
-        if (username != null && !"".equals(username)) {
-            session.setAttribute("username", username);
+    
+        //在登录系统登录后会返回username
+        String username = request.getParameter("username");
+        if(username !=null && !username.isEmpty()) {
+            //在子系统也加入到cookie
+            CookieUtil.addCookieAttribute("username-client1", username, 60*60, response);
             return true;
-        } else {
-            username = CookieUtil.getCookieAttribute("username", request);
-            if (username != null && !"".equals(username)) {
-                CookieUtil.addCookieAttribute("username-client1", username, 60 * 60, response);
-                session.setAttribute("username", username);
-                return true;
-            }
         }
+    
+        //已经登陆过了
+        username = CookieUtil.getCookieAttribute("username-client1", request);
+        if(username !=null && !username.isEmpty()) {
+            return true;
+        }
+    
+        //没登陆则去登录
         String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+uri;
         response.sendRedirect(UrlContants.server + "/tologin?redirect=" + basePath);
         return false;

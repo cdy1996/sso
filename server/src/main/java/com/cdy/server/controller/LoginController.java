@@ -27,7 +27,7 @@ public class LoginController {
     public String toLogin(HttpServletRequest request,HttpServletResponse response, String redirect, Model model) throws IOException {
         String username = CookieUtil.getCookieAttribute("username", request);
         if (username != null) {
-            response.sendRedirect(redirect);
+            response.sendRedirect(redirect+"username="+username);
             return null;
         }
         model.addAttribute("redirect", redirect);
@@ -37,12 +37,14 @@ public class LoginController {
     @RequestMapping("/login")
     public void login(HttpServletRequest request,HttpServletResponse response, String username, String password, String redirect) throws IOException {
        CookieUtil.addCookieAttribute("username", username, 60*60, response);
-        response.sendRedirect(redirect);
+        response.sendRedirect(redirect+"?username="+username);
     }
     
     @RequestMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response) {
        CookieUtil.delCookieAttribute("username", request, response);
+       CookieUtil.delCookieAttribute("client1-username", request, response);
+       CookieUtil.delCookieAttribute("client2-username", request, response);
         return "forward:tologin";
         
     }
