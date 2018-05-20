@@ -28,9 +28,9 @@ public class UserController {
     @RequestMapping("/user")
     @ResponseBody
     public String user(HttpServletRequest request) {
-       
         String username = CookieUtil.getCookieAttribute("username-client2", request);
-        System.out.println(username);
+        String password = JedisUtil.get(username);
+        System.out.println(username+"-"+password);
         return username;
     }
 }

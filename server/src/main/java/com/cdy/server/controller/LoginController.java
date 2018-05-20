@@ -20,7 +20,8 @@ public class LoginController {
     @ResponseBody
     public String user(HttpServletRequest request){
         String username = CookieUtil.getCookieAttribute("username", request);
-        return username;
+        String password = JedisUtil.get(username);
+        return username+"-"+password;
     }
     
     @RequestMapping("/tologin")
@@ -36,15 +37,16 @@ public class LoginController {
     
     @RequestMapping("/login")
     public void login(HttpServletRequest request,HttpServletResponse response, String username, String password, String redirect) throws IOException {
-       CookieUtil.addCookieAttribute("username", username, 60*60, response);
+        CookieUtil.addCookieAttribute("username", username, 60*60, response);
+        JedisUtil.set(username, password, 60 * 60);
         response.sendRedirect(redirect+"?username="+username);
     }
     
     @RequestMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response) {
-       CookieUtil.delCookieAttribute("username", request, response);
-       CookieUtil.delCookieAttribute("client1-username", request, response);
-       CookieUtil.delCookieAttribute("client2-username", request, response);
+        CookieUtil.delCookieAttribute("username", request, response);
+        CookieUtil.delCookieAttribute("client1-username", request, response);
+        CookieUtil.delCookieAttribute("client2-username", request, response);
         return "forward:tologin";
         
     }

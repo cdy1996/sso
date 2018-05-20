@@ -28,8 +28,12 @@ public class UserController {
     @RequestMapping("/user")
     @ResponseBody
     public String user(HttpServletRequest request) {
-        String username = username = CookieUtil.getCookieAttribute("username-client1", request);
-        System.out.println(username);
-        return username;
+        String username = request.getParameter("username");
+        if(username == null || username.isEmpty()) {
+            username = CookieUtil.getCookieAttribute("username-client1", request);
+        }
+        String password = JedisUtil.get(username);
+        System.out.println(username+"-"+password);
+        return username+"-"+password;
     }
 }
