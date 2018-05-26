@@ -14,6 +14,8 @@ public class LoginInterceptor  implements HandlerInterceptor {
     
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) throws Exception {
+        String uri= request.getRequestURI();
+        System.out.println("请求链接:" + uri);
         return true;
     }
     

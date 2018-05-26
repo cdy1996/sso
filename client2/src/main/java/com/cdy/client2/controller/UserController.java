@@ -1,5 +1,7 @@
 package com.cdy.client2.controller;
 
+import com.cdy.CookieUtil;
+import com.cdy.HttpClientUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -17,13 +19,13 @@ public class UserController {
     
     @RequestMapping("/login")
     public void login(HttpServletResponse response) throws IOException {
-        response.sendRedirect(UrlContants.server + "/tologin?redirect=" + UrlContants.client2 + "/user");
+        response.sendRedirect(Contants.server_url + "/tologin?redirect=" + Contants.client2_url + "/user");
     }
     
     @RequestMapping("/logout")
     public void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String token = CookieUtil.getCookieAttribute("client2-token", request);
-        response.sendRedirect(UrlContants.server + "/logout?token="+token);
+        String token = CookieUtil.getCookie(Contants.client2_url, request);
+        response.sendRedirect(Contants.server_url + "/logout?token="+token);
     }
     
     @RequestMapping("/user")
@@ -31,9 +33,10 @@ public class UserController {
     public String user(HttpServletRequest request) throws IOException {
         String token = request.getParameter("token");
         if(token == null || token.isEmpty()) {
-            token = CookieUtil.getCookieAttribute("client2-token", request);
+            token = CookieUtil.getCookie(Contants.client2_url, request);
         }
-        String result = (String) HttpClientUtil.doGet(UrlContants.server + "/user?token="+token);
+        String result = HttpClientUtil.doGet(Contants.server_url + "/user?token="+token);
         return result;
     }
+    
 }

@@ -1,5 +1,6 @@
 package com.cdy.client1.controller;
 
+import com.cdy.CookieUtil;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -15,6 +16,7 @@ public class LoginInterceptor  implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) throws Exception {
         String uri= request.getRequestURI();
+        System.out.println("请求链接:" + uri);
         if (uri.contains("login") || uri.contains("logout")) {
             return true;
         }
@@ -23,19 +25,19 @@ public class LoginInterceptor  implements HandlerInterceptor {
         String token = request.getParameter("token");
         if(token !=null && !token.isEmpty()) {
             //在子系统也加入到cookie
-            CookieUtil.addCookieAttribute("client1-token", token, 60*60, response);
+            CookieUtil.addCookie(Contants.client1_token, token, 60*60, response);
             return true;
         }
     
         //已经登陆过了
-        token = CookieUtil.getCookieAttribute("client1-token", request);
+        token = CookieUtil.getCookie(Contants.client1_token, request);
         if(token !=null && !token.isEmpty()) {
             return true;
         }
     
         //没登陆则去登录
         String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+uri;
-        response.sendRedirect(UrlContants.server + "/tologin?redirect=" + basePath);
+        response.sendRedirect(Contants.server_url + "/tologin?redirect=" + basePath);
         return false;
     }
     

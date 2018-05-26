@@ -1,5 +1,7 @@
 package com.cdy.server.controller;
 
+import com.cdy.CookieUtil;
+import com.cdy.JedisUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,23 +17,23 @@ import java.io.IOException;
  */
 @Controller
 public class LoginController {
-
+    
     @RequestMapping("/user")
     @ResponseBody
-    public String user(HttpServletRequest request){
+    public String user(HttpServletRequest request) {
         String token = request.getParameter("token");
-        if(token ==null || token.isEmpty()) {
-            token = CookieUtil.getCookieAttribute("token", request);
+        if (token == null || token.isEmpty()) {
+            token = CookieUtil.getCookie(Contants.server_token, request);
         }
         String password = JedisUtil.get(token);
-        return token+"-"+password;
+        return token + "-" + password;
     }
     
     @RequestMapping("/tologin")
-    public String toLogin(HttpServletRequest request,HttpServletResponse response, String redirect, Model model) throws IOException {
-        String username = CookieUtil.getCookieAttribute("token", request);
+    public String toLogin(HttpServletRequest request, HttpServletResponse response, String redirect, Model model) throws IOException {
+        String username = CookieUtil.getCookie(Contants.server_token, request);
         if (username != null) {
-            response.sendRedirect(redirect+"?token="+username);
+            response.sendRedirect(redirect + "?token=" + username);
             return null;
         }
         model.addAttribute("redirect", redirect);
@@ -39,17 +41,17 @@ public class LoginController {
     }
     
     @RequestMapping("/login")
-    public void login(HttpServletRequest request,HttpServletResponse response, String username, String password, String redirect) throws IOException {
-        CookieUtil.addCookieAttribute("token", username, 60*60, response);
+    public void login(HttpServletRequest request, HttpServletResponse response, String username, String password, String redirect) throws IOException {
+        CookieUtil.addCookie(Contants.server_token, username, 60 * 60, response);
         JedisUtil.set(username, password, 60 * 60);
-        response.sendRedirect(redirect+"?token="+username);
+        response.sendRedirect(redirect + "?token=" + username);
     }
     
     @RequestMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response, String token) {
-        CookieUtil.delCookieAttribute("token", request, response);
-        CookieUtil.delCookieAttribute("client1-token", request, response);
-        CookieUtil.delCookieAttribute("client2-token", request, response);
+        CookieUtil.delCookie(Contants.server_token, request, response);
+        CookieUtil.delCookie(Contants.client1_token, request, response);
+        CookieUtil.delCookie(Contants.client2_token, request, response);
         JedisUtil.delete(token);
         return "forward:tologin";
         
