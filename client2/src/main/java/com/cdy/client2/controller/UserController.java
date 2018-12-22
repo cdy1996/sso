@@ -1,7 +1,7 @@
 package com.cdy.client2.controller;
 
-import com.cdy.CookieUtil;
-import com.cdy.HttpClientUtil;
+import com.cdy.web.CookieUtil;
+import com.cdy.web.HttpUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -25,17 +25,17 @@ public class UserController {
     @RequestMapping("/logout")
     public void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String token = CookieUtil.getCookie(Contants.client2_url, request);
-        response.sendRedirect(Contants.server_url + "/logout?token="+token);
+        response.sendRedirect(Contants.server_url + "/logout?token=" + token);
     }
     
     @RequestMapping("/user")
     @ResponseBody
     public String user(HttpServletRequest request) throws IOException {
         String token = request.getParameter("token");
-        if(token == null || token.isEmpty()) {
+        if (token == null || token.isEmpty()) {
             token = CookieUtil.getCookie(Contants.client2_url, request);
         }
-        String result = HttpClientUtil.doGet(Contants.server_url + "/user?token="+token);
+        String result = HttpUtil.doGet(Contants.server_url + "/user?token=" + token);
         return result;
     }
     

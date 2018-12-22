@@ -43,14 +43,14 @@ public class UserController {
         String result = (String) HttpClientUtil.doGet(Contants.server_url + "/user?token=" + token);
         HttpSession session = request.getSession();
         Object test = session.getAttribute("test");
-        if(test == null ){
+        if (test == null) {
             session.setAttribute("test", "test");
         }
         String s = JsonUtil.toJson(request.getSession());
         System.out.println(s);
         HttpSession httpSession = JsonUtil.parseObject(s, HttpSession.class);
         System.out.println(httpSession.getAttribute("test"));
-    
+
         return result;
     }
 }

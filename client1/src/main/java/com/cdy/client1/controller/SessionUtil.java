@@ -20,7 +20,7 @@ public class SessionUtil {
     
     public static Map<String, Object> getSession(String key) {
         String s = JedisUtil.get(key);
-        if(s == null){
+        if (s == null) {
             return null;
         }
         return JsonUtil.parseObject(s, Map.class);

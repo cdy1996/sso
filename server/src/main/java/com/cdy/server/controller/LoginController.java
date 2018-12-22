@@ -1,7 +1,8 @@
 package com.cdy.server.controller;
 
-import com.cdy.CookieUtil;
-import com.cdy.JedisUtil;
+import com.cdy.redis.RedisUtil;
+import com.cdy.web.CookieUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +18,8 @@ import java.io.IOException;
  */
 @Controller
 public class LoginController {
+    @@Autowired
+    RedisUtil redisUtil;
     
     @RequestMapping("/user")
     @ResponseBody
@@ -25,7 +28,7 @@ public class LoginController {
         if (token == null || token.isEmpty()) {
             token = CookieUtil.getCookie(Contants.server_token, request);
         }
-        String password = JedisUtil.get(token);
+        String password = redisUtil.get(token);
         return token + "-" + password;
     }
     
@@ -43,7 +46,7 @@ public class LoginController {
     @RequestMapping("/login")
     public void login(HttpServletRequest request, HttpServletResponse response, String username, String password, String redirect) throws IOException {
         CookieUtil.addCookie(Contants.server_token, username, 60 * 60, response);
-        JedisUtil.set(username, password, 60 * 60);
+        redisUtil.set(username, password, 60 * 60);
         response.sendRedirect(redirect + "?token=" + username);
     }
     
@@ -52,7 +55,7 @@ public class LoginController {
         CookieUtil.delCookie(Contants.server_token, request, response);
         CookieUtil.delCookie(Contants.client1_token, request, response);
         CookieUtil.delCookie(Contants.client2_token, request, response);
-        JedisUtil.delete(token);
+        redisUtil.delete(token);
         return "forward:tologin";
         
     }

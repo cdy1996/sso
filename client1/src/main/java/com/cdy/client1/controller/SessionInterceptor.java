@@ -1,6 +1,6 @@
 package com.cdy.client1.controller;
 
-import com.cdy.CookieUtil;
+import com.cdy.web.CookieUtil;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -21,14 +21,14 @@ public class SessionInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) throws Exception {
         String sessionId = CookieUtil.getCookie(Contants.session_id, request);
-        if(sessionId == null){
+        if (sessionId == null) {
             HttpSession session = request.getSession();
             sessionId = session.getId();
             CookieUtil.addCookie(Contants.session_id, sessionId, 24 * 60 * 60, response);
         }
         HttpSession session = request.getSession();
         Map<String, Object> map = SessionUtil.getSession(sessionId);
-        if(map == null){
+        if (map == null) {
             return true;
         }
         Set<Map.Entry<String, Object>> entries = map.entrySet();
@@ -57,6 +57,6 @@ public class SessionInterceptor implements HandlerInterceptor {
     
     @Override
     public void afterCompletion(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) throws Exception {
-    
+
     }
 }
