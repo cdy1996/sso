@@ -18,7 +18,7 @@ import java.io.IOException;
  */
 @Controller
 public class LoginController {
-    @@Autowired
+    @Autowired
     RedisUtil redisUtil;
     
     @RequestMapping("/user")
